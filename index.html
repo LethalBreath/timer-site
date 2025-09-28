@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Spawn Timers</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #121212; color: #f0f0f0; }
+    table { border-collapse: collapse; margin: 20px auto; width: 80%; }
+    th, td { border: 1px solid #444; padding: 8px 12px; text-align: center; }
+    th { background: #222; }
+    .countdown { font-weight: bold; color: #4CAF50; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">Таймеры спавна </h2>
+  <table id="spawnTable">
+    <thead>
+      <tr>
+        <th>Событие</th>
+        <th>Время спавна (Server Time)</th>
+        <th>Осталось</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Blrk</td>
+        <td data-time="8:47:00">8:47:00</td>
+        <td class="countdown"></td>
+      </tr>
+      <tr>
+        <td>Frst</td>
+        <td data-time="13:30:00">13:30:00</td>
+        <td class="countdown"></td>
+      </tr>
+      <tr>
+        <td>SSP</td>
+        <td data-time="15:00:00">15:00:00</td>
+        <td class="countdown"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    function updateCountdowns() {
+      const rows = document.querySelectorAll("#spawnTable tbody tr");
+
+      // Текущее время в UTC+1
+      const nowUTC = new Date();
+      const now = new Date(nowUTC.getTime() - 3 * 60 * 60 * 1000);
+
+      rows.forEach(row => {
+        const timeStr = row.querySelector("td[data-time]").dataset.time;
+        const [h, m, s] = timeStr.split(":").map(Number);
+
+        // Время события (сегодня, по UTC+1)
+        let eventTime = new Date(now);
+        eventTime.setHours(h, m, s, 0);
+
+        // Если событие уже прошло — переносим на завтра
+        if (eventTime < now) {
+          eventTime.setDate(eventTime.getDate() + 1);
+        }
+
+        let diff = eventTime - now;
+
+        let hours = Math.floor(diff / (1000 * 60 * 60));
+        let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        row.querySelector(".countdown").textContent =
+          `${hours.toString().padStart(2,"0")}:${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`;
+      });
+    }
+
+    setInterval(updateCountdowns, 1000);
+    updateCountdowns();
+  </script>
+</body>
+</html>
